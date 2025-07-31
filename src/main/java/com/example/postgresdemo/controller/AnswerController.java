@@ -1,5 +1,6 @@
 package com.example.postgresdemo.controller;
 
+import com.example.postgresdemo.DTO.DtoAnswer;
 import com.example.postgresdemo.exception.ResourceNotFoundException;
 import com.example.postgresdemo.model.Answer;
 import com.example.postgresdemo.repository.AnswerRepository;
@@ -8,7 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 public class AnswerController {
@@ -20,8 +23,15 @@ public class AnswerController {
     private QuestionRepository questionRepository;
 
     @GetMapping("/questions/{questionId}/answers")
-    public List<Answer> getAnswersByQuestionId(@PathVariable Long questionId) {
-        return answerRepository.findByQuestionId(questionId);
+    public List<DtoAnswer> getAnswersByQuestionId(@PathVariable Long questionId) {
+         List<Answer> answer = answerRepository.findByQuestionId(questionId);
+
+         List<DtoAnswer> dtoAnswers = answer.stream().
+                 map(ans -> new DtoAnswer(ans.getText(),
+                         ans.getQuestion().getDescription(),
+                         ans.getQuestion().getDescription())).
+                 collect(Collectors.toList());
+        return dtoAnswers;
     }
 
     @PostMapping("/questions/{questionId}/answers")
@@ -63,4 +73,6 @@ public class AnswerController {
                 }).orElseThrow(() -> new ResourceNotFoundException("Answer not found with id " + answerId));
 
     }
+
+
 }
