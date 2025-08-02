@@ -12,7 +12,11 @@ public class RedisConfig {
     public JedisPool jedisPool() {
         JedisPoolConfig config = new JedisPoolConfig();
         config.setMaxTotal(8);
-        config.setJmxEnabled(false); // <-- Это отключает регистрацию MBean
-        return new JedisPool(config, "localhost", 6379);
+        config.setJmxEnabled(false);
+
+        String redisHost = System.getenv("REDIS_HOST");
+        int redisPort = Integer.parseInt(System.getenv("REDIS_PORT"));
+
+        return new JedisPool(config, redisHost, redisPort);
     }
 }
